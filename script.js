@@ -131,6 +131,10 @@ class DailyQuotesExtension {
             
             // Small delay to ensure content is rendered, then show container
             await this.delay(50);
+            
+            // Remove inline style and add ready class to show container
+            quoteContainer.style.opacity = '';
+            quoteContainer.style.visibility = '';
             quoteContainer.classList.add('ready');
             
             // Remove initial classes after container is visible and animation completes
