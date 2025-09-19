@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Daily Quotes - New Tab",
   "version": "1.0.0",
-  "description": "Replace your new tab with inspiring daily quotes and beautiful animations",
+  "description": "Transform your new tab into a source of daily inspiration with beautiful quotes, smooth animations, and a live clock. Start each browsing session with motivation.",
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   },
@@ -14,5 +14,7 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "author": "Your Name"
+  "author": "Monika",
+  "homepage_url": "https://github.com/your-username/daily-quotes-extension",
+  "short_name": "Daily Quotes"
 }

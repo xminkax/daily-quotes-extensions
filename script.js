@@ -11,10 +11,31 @@ class DailyQuotesExtension {
     }
 
     async init() {
+        // Add initial loading classes for smooth entry animation
+        const quoteContainer = document.querySelector('.quote-container');
+        const quoteText = document.getElementById('quote-text');
+        const quoteAuthor = document.getElementById('quote-author');
+        
+        // Set initial state to prevent content jump
+        quoteContainer.classList.add('initial-load');
+        quoteText.classList.add('initial-load');
+        quoteAuthor.classList.add('initial-load');
+        
+        // Clear initial content to prevent flash
+        quoteText.textContent = '';
+        quoteAuthor.textContent = '';
+        
         await this.loadQuotes();
         this.setupEventListeners();
         this.updateTime();
-        this.displayDailyQuote();
+        
+        // Load and display quote immediately to prevent layout shift
+        await this.displayDailyQuote();
+        
+        // Transition to natural height smoothly after all animations complete
+        setTimeout(() => {
+            this.transitionToNaturalHeight(quoteContainer);
+        }, 2200);
         
         // Update time every minute
         setInterval(() => this.updateTime(), 60000);
@@ -46,7 +67,8 @@ class DailyQuotesExtension {
     }
 
     setupEventListeners() {
-        this.refreshBtn.addEventListener('click', () => {
+        this.refreshBtn.addEventListener('click', (e) => {
+            this.handleRefreshClick(e.target);
             this.displayNewQuote();
         });
 
@@ -54,6 +76,7 @@ class DailyQuotesExtension {
         document.addEventListener('keydown', (e) => {
             if (e.code === 'Space' && !e.ctrlKey && !e.altKey && !e.shiftKey) {
                 e.preventDefault();
+                this.handleRefreshClick(this.refreshBtn);
                 this.displayNewQuote();
             }
         });
@@ -81,8 +104,9 @@ class DailyQuotesExtension {
     }
 
     async displayDailyQuote() {
-        const quoteIndex = this.getDailyQuoteIndex();
-        await this.animateQuoteTransition(this.quotes[quoteIndex]);
+        // Show a random quote on each new tab open (per-load randomness)
+        const quoteIndex = this.getRandomQuoteIndex();
+        await this.animateQuoteTransition(this.quotes[quoteIndex], true);
         this.currentQuote = this.quotes[quoteIndex];
     }
 
@@ -97,17 +121,60 @@ class DailyQuotesExtension {
         this.currentQuote = newQuote;
     }
 
-    async animateQuoteTransition(quote) {
-        // Add fade-out class
+    async animateQuoteTransition(quote, isInitial = false) {
+        const quoteContainer = document.querySelector('.quote-container');
+        
+        if (isInitial) {
+            // For initial load, just set content without fade animation
+            this.quoteText.textContent = `"${quote.text}"`;
+            this.quoteAuthor.textContent = `— ${quote.author}`;
+            
+            // Remove initial classes after a delay to allow entry animation
+            setTimeout(() => {
+                this.quoteText.classList.remove('initial-load');
+                this.quoteAuthor.classList.remove('initial-load');
+                quoteContainer.classList.remove('initial-load');
+            }, 1500);
+            return;
+        }
+        
+        // Calculate current height before content change
+        const currentHeight = quoteContainer.offsetHeight;
+        
+        // Set current height explicitly to enable smooth transition
+        quoteContainer.style.height = currentHeight + 'px';
+        
+        // For subsequent quotes, use smooth transition
         this.quoteText.classList.add('quote-fade-out');
         this.quoteAuthor.classList.add('quote-fade-out');
 
-        // Wait for fade-out animation
-        await this.delay(400);
+        // Wait for fade-out animation (0.3s)
+        await this.delay(300);
 
-        // Update content
+        // Create a temporary container to measure new content height
+        const tempContainer = quoteContainer.cloneNode(true);
+        tempContainer.style.position = 'absolute';
+        tempContainer.style.visibility = 'hidden';
+        tempContainer.style.height = 'auto';
+        tempContainer.style.top = '-9999px';
+        
+        // Update content in temp container
+        const tempQuoteText = tempContainer.querySelector('#quote-text');
+        const tempQuoteAuthor = tempContainer.querySelector('#quote-author');
+        tempQuoteText.textContent = `"${quote.text}"`;
+        tempQuoteAuthor.textContent = `— ${quote.author}`;
+        
+        // Add temp container to DOM to measure
+        document.body.appendChild(tempContainer);
+        const newHeight = tempContainer.offsetHeight;
+        document.body.removeChild(tempContainer);
+        
+        // Update actual content
         this.quoteText.textContent = `"${quote.text}"`;
         this.quoteAuthor.textContent = `— ${quote.author}`;
+        
+        // Animate to new height with 0.3s ease transition
+        quoteContainer.style.height = newHeight + 'px';
 
         // Remove fade-out and add fade-in
         this.quoteText.classList.remove('quote-fade-out');
@@ -115,15 +182,30 @@ class DailyQuotesExtension {
         this.quoteText.classList.add('quote-fade-in');
         this.quoteAuthor.classList.add('quote-fade-in');
 
-        // Clean up fade-in class after animation
+        // Clean up fade-in class and height style after animation
         setTimeout(() => {
             this.quoteText.classList.remove('quote-fade-in');
             this.quoteAuthor.classList.remove('quote-fade-in');
-        }, 800);
+            
+            // Remove height constraint after 1s transition
+            setTimeout(() => {
+                quoteContainer.style.height = '';
+            }, 1100); // Slightly longer than 1s to ensure transition completes
+        }, 300); // Keep fade timing at 0.3s
     }
 
     delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    
+    handleRefreshClick(buttonElement) {
+        // Add visual feedback for button click
+        buttonElement.classList.add('clicked');
+        
+        // Remove the clicked class after animation completes
+        setTimeout(() => {
+            buttonElement.classList.remove('clicked');
+        }, 600);
     }
 
     // Store/retrieve last viewed date to ensure daily quotes work properly
@@ -181,7 +263,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const xMovement = (mouseX - 0.5) * speed;
             const yMovement = (mouseY - 0.5) * speed;
             
-            element.style.transform += ` translate(${xMovement}px, ${yMovement}px)`;
+            // Set transform rather than appending to prevent accumulation
+            element.style.transform = `translate(${xMovement}px, ${yMovement}px)`;
         });
     });
 });
