@@ -125,11 +125,15 @@ class DailyQuotesExtension {
         const quoteContainer = document.querySelector('.quote-container');
         
         if (isInitial) {
-            // For initial load, just set content without fade animation
+            // For initial load, set content first
             this.quoteText.textContent = `"${quote.text}"`;
             this.quoteAuthor.textContent = `— ${quote.author}`;
             
-            // Remove initial classes after a delay to allow entry animation
+            // Small delay to ensure content is rendered, then show container
+            await this.delay(50);
+            quoteContainer.classList.add('ready');
+            
+            // Remove initial classes after container is visible and animation completes
             setTimeout(() => {
                 this.quoteText.classList.remove('initial-load');
                 this.quoteAuthor.classList.remove('initial-load');
