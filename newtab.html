@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Quotes</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="background-animation">
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+        </div>
+        
+        <main class="quote-container">
+            <div class="quote-wrapper">
+                <blockquote class="quote-text" id="quote-text">
+                    Loading your daily inspiration...
+                </blockquote>
+                <cite class="quote-author" id="quote-author">
+                    <!-- Author will be inserted here -->
+                </cite>
+            </div>
+            
+            <div class="controls">
+                <button class="refresh-btn" id="refresh-btn" title="Get new quote">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="m3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                </button>
+            </div>
+        </main>
+        
+        <footer class="footer">
+            <div class="time-display" id="time-display">
+                <!-- Current time will be displayed here -->
+            </div>
+        </footer>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
