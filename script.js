@@ -12,35 +12,34 @@ class DailyQuotesExtension {
         this.quoteWrapper = document.querySelector('.quote-wrapper');
         this.quoteContainer = document.querySelector('.quote-container');
         this.refreshBtn = document.getElementById('refresh-btn');
-        this.timeDisplay = document.getElementById('time-display');
-        
+        // removed: this.timeDisplay = document.getElementById('time-display');
+
         this.init();
     }
 
     async init() {
-        // Add initial loading classes for smooth entry animation
-        const quoteContainer = document.querySelector('.quote-container');
-        const quoteText = document.getElementById('quote-text');
-        const quoteAuthor = document.getElementById('quote-author');
-        
-        // Set initial state to prevent content jump
-        quoteContainer.classList.add('initial-load');
-        quoteText.classList.add('initial-load');
-        quoteAuthor.classList.add('initial-load');
-        
-        // Clear initial content to prevent flash
-        quoteText.textContent = '';
-        quoteAuthor.textContent = '';
-        
-        await this.loadQuotes();
-        this.setupEventListeners();
-        this.updateTime();
-        
-        // Load and display quote immediately to prevent layout shift
-        await this.displayDailyQuote();
-        
-        // Update time every minute
-        setInterval(() => this.updateTime(), 60000);
+        // Load data first
+        await this.loadQuotes?.();
+
+        this.setupEventListeners?.();
+
+        // removed: this.updateTime();
+
+        // Layout helpers (keep your existing ones if present)
+        this.enableTopAlignment?.();
+        this.setupAutoSizing?.();
+
+        // Populate the quote content
+        this.displayDailyQuote?.();
+
+        if (document.fonts && document.fonts.ready) {
+            try { await document.fonts.ready; } catch (_) {}
+        }
+        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+        this.triggerInitialAnimation?.();
+
+        // removed: setInterval(() => this.updateTime(), 60000);
     }
 
     async loadQuotes() {
@@ -83,16 +82,6 @@ class DailyQuotesExtension {
                 this.displayNewQuote();
             }
         });
-    }
-
-    updateTime() {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString([], { 
-            hour: '2-digit', 
-            minute: '2-digit',
-            hour12: true 
-        });
-        this.timeDisplay.textContent = timeString;
     }
 
     getDailyQuoteIndex() {
