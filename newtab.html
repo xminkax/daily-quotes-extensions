@@ -18,24 +18,34 @@
         
         <main class="quote-container initial-load" style="opacity: 0; visibility: hidden;">
             <div class="quote-wrapper">
-                <blockquote class="quote-text initial-load" id="quote-text">
-                    <!-- Content loaded by JavaScript -->
-                </blockquote>
-                <cite class="quote-author initial-load" id="quote-author">
-                    <!-- Author loaded by JavaScript -->
-                </cite>
-            </div>
-            
-            <div class="controls">
-                <button class="refresh-btn" id="refresh-btn" title="Get new quote">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="23 4 23 10 17 10"></polyline>
-                        <polyline points="1 20 1 14 7 14"></polyline>
-                        <path d="m3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-                    </svg>
-                </button>
+                <div class="quote-card front" id="current-quote-card">
+                    <blockquote class="quote-text initial-load" id="quote-text">
+                        <!-- Content loaded by JavaScript -->
+                    </blockquote>
+                    <cite class="quote-author initial-load" id="quote-author">
+                        <!-- Author loaded by JavaScript -->
+                    </cite>
+                </div>
+                <div class="quote-card back" id="next-quote-card" style="opacity: 0;">
+                    <blockquote class="quote-text" id="next-quote-text">
+                        <!-- Next quote content loaded by JavaScript -->
+                    </blockquote>
+                    <cite class="quote-author" id="next-quote-author">
+                        <!-- Next quote author loaded by JavaScript -->
+                    </cite>
+                </div>
             </div>
         </main>
+        
+        <div class="controls">
+            <button class="refresh-btn" id="refresh-btn" title="Get new quote">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <polyline points="1 20 1 14 7 14"></polyline>
+                    <path d="m3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+            </button>
+        </div>
         
         <footer class="footer">
             <div class="time-display" id="time-display">

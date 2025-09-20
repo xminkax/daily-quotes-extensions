@@ -114,14 +114,8 @@ body {
     width: 800px;
     max-width: 90vw;
     min-height: 240px;
-    padding: 40px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     transform: translateY(0);
-    transition: height 1s ease, box-shadow 0.3s ease, background 0.3s ease, backdrop-filter 0.3s ease, opacity 0.5s ease;
+    transition: opacity 0.5s ease;
     opacity: 0;
     visibility: hidden;
 }
@@ -149,6 +143,8 @@ body {
 
 .quote-wrapper {
     margin-bottom: 30px;
+    position: relative;
+    transform-style: preserve-3d;
 }
 
 .quote-text {
@@ -200,6 +196,9 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top: 30px;
+    position: relative;
+    z-index: 2;
 }
 
 .refresh-btn {
@@ -218,6 +217,7 @@ body {
     position: relative;
     overflow: hidden;
     transform-origin: center center;
+    transform: rotate(0deg) scale(1);
 }
 
 .refresh-btn:hover {
@@ -231,9 +231,10 @@ body {
 }
 
 .refresh-btn.clicked {
-    background: rgba(255, 255, 255, 0.4);
-    transform: rotate(360deg) scale(1.08);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.4) !important;
+    transform: rotate(360deg) scale(1.08) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+    transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
 }
 
 .refresh-btn.clicked::after {
@@ -288,6 +289,224 @@ body {
     opacity: 1;
     transform: translateY(0) scale(1);
     transition: all 0.3s ease;
+}
+
+/* Deck swap animation styles */
+.quote-container.deck-swap {
+    perspective: 1000px;
+    transform-style: preserve-3d;
+}
+
+.quote-wrapper {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease-in-out;
+}
+
+.quote-wrapper.flipping {
+    transform: rotateY(180deg);
+}
+
+.quote-card {
+    position: absolute;
+    width: 100%;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+}
+
+.quote-card.front {
+    transform: rotateY(0deg);
+}
+
+.quote-card.back {
+    transform: rotateY(180deg);
+    opacity: 0;
+}
+
+.quote-card.flip-out {
+    animation: flipOut 0.6s ease-in-out forwards;
+}
+
+.quote-card.flip-in {
+    animation: flipIn 0.6s ease-in-out forwards;
+}
+
+@keyframes flipOut {
+    0% {
+        transform: rotateY(0deg) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: rotateY(90deg) scale(0.95);
+        opacity: 0.5;
+    }
+    100% {
+        transform: rotateY(180deg) scale(0.9);
+        opacity: 0;
+    }
+}
+
+@keyframes flipIn {
+    0% {
+        transform: rotateY(-180deg) scale(0.9);
+        opacity: 0;
+    }
+    50% {
+        transform: rotateY(-90deg) scale(0.95);
+        opacity: 0.5;
+    }
+    100% {
+        transform: rotateY(0deg) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Enhanced deck swap with 3D depth */
+.quote-container.deck-swap-enhanced {
+    perspective: 1200px;
+}
+
+.quote-container.deck-swap-enhanced .quote-wrapper {
+    transform-style: preserve-3d;
+}
+
+.quote-container.deck-swap-enhanced .quote-card {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.quote-container.deck-swap-enhanced .quote-card.flip-out {
+    animation: enhancedFlipOut 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.quote-container.deck-swap-enhanced .quote-card.flip-in {
+    animation: enhancedFlipIn 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes enhancedFlipOut {
+    0% {
+        transform: rotateY(0deg) translateZ(0px) scale(1);
+        opacity: 1;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    10% {
+        transform: rotateY(18deg) translateZ(8px) scale(1.005);
+        opacity: 0.95;
+        box-shadow: 0 11px 32px rgba(0, 0, 0, 0.22);
+    }
+    20% {
+        transform: rotateY(36deg) translateZ(12px) scale(1.01);
+        opacity: 0.9;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+    }
+    30% {
+        transform: rotateY(54deg) translateZ(10px) scale(1.008);
+        opacity: 0.85;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    40% {
+        transform: rotateY(72deg) translateZ(8px) scale(1.005);
+        opacity: 0.75;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    50% {
+        transform: rotateY(90deg) translateZ(0px) scale(1);
+        opacity: 0.6;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    }
+    60% {
+        transform: rotateY(108deg) translateZ(-5px) scale(0.995);
+        opacity: 0.45;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+    70% {
+        transform: rotateY(126deg) translateZ(-8px) scale(0.98);
+        opacity: 0.3;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+    }
+    80% {
+        transform: rotateY(144deg) translateZ(-12px) scale(0.95);
+        opacity: 0.15;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    90% {
+        transform: rotateY(162deg) translateZ(-16px) scale(0.92);
+        opacity: 0.05;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+    }
+    100% {
+        transform: rotateY(180deg) translateZ(-20px) scale(0.9);
+        opacity: 0;
+        box-shadow: 0 0px 0px rgba(0, 0, 0, 0);
+    }
+}
+
+@keyframes enhancedFlipIn {
+    0% {
+        transform: rotateY(-180deg) translateZ(-20px) scale(0.9);
+        opacity: 0;
+        box-shadow: 0 0px 0px rgba(0, 0, 0, 0);
+    }
+    10% {
+        transform: rotateY(-162deg) translateZ(-16px) scale(0.92);
+        opacity: 0.05;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+    }
+    20% {
+        transform: rotateY(-144deg) translateZ(-12px) scale(0.95);
+        opacity: 0.15;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    30% {
+        transform: rotateY(-126deg) translateZ(-8px) scale(0.98);
+        opacity: 0.3;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+    }
+    40% {
+        transform: rotateY(-108deg) translateZ(-5px) scale(0.995);
+        opacity: 0.45;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+    50% {
+        transform: rotateY(-90deg) translateZ(0px) scale(1);
+        opacity: 0.6;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    }
+    60% {
+        transform: rotateY(-72deg) translateZ(8px) scale(1.005);
+        opacity: 0.75;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    70% {
+        transform: rotateY(-54deg) translateZ(10px) scale(1.008);
+        opacity: 0.85;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    80% {
+        transform: rotateY(-36deg) translateZ(12px) scale(1.01);
+        opacity: 0.9;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+    }
+    90% {
+        transform: rotateY(-18deg) translateZ(8px) scale(1.005);
+        opacity: 0.95;
+        box-shadow: 0 11px 32px rgba(0, 0, 0, 0.22);
+    }
+    100% {
+        transform: rotateY(0deg) translateZ(0px) scale(1);
+        opacity: 1;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
 }
 
 /* Responsive design */

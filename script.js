@@ -2,8 +2,15 @@ class DailyQuotesExtension {
     constructor() {
         this.quotes = [];
         this.currentQuote = null;
+        this.isAnimating = false;
         this.quoteText = document.getElementById('quote-text');
         this.quoteAuthor = document.getElementById('quote-author');
+        this.nextQuoteText = document.getElementById('next-quote-text');
+        this.nextQuoteAuthor = document.getElementById('next-quote-author');
+        this.currentQuoteCard = document.getElementById('current-quote-card');
+        this.nextQuoteCard = document.getElementById('next-quote-card');
+        this.quoteWrapper = document.querySelector('.quote-wrapper');
+        this.quoteContainer = document.querySelector('.quote-container');
         this.refreshBtn = document.getElementById('refresh-btn');
         this.timeDisplay = document.getElementById('time-display');
         
@@ -31,11 +38,6 @@ class DailyQuotesExtension {
         
         // Load and display quote immediately to prevent layout shift
         await this.displayDailyQuote();
-        
-        // Transition to natural height smoothly after all animations complete
-        setTimeout(() => {
-            this.transitionToNaturalHeight(quoteContainer);
-        }, 2200);
         
         // Update time every minute
         setInterval(() => this.updateTime(), 60000);
@@ -68,7 +70,8 @@ class DailyQuotesExtension {
 
     setupEventListeners() {
         this.refreshBtn.addEventListener('click', (e) => {
-            this.handleRefreshClick(e.target);
+            e.preventDefault();
+            this.handleRefreshClick(this.refreshBtn);
             this.displayNewQuote();
         });
 
@@ -122,8 +125,6 @@ class DailyQuotesExtension {
     }
 
     async animateQuoteTransition(quote, isInitial = false) {
-        const quoteContainer = document.querySelector('.quote-container');
-        
         if (isInitial) {
             // For initial load, set content first
             this.quoteText.textContent = `"${quote.text}"`;
@@ -133,73 +134,63 @@ class DailyQuotesExtension {
             await this.delay(50);
             
             // Remove inline style and add ready class to show container
-            quoteContainer.style.opacity = '';
-            quoteContainer.style.visibility = '';
-            quoteContainer.classList.add('ready');
+            this.quoteContainer.style.opacity = '';
+            this.quoteContainer.style.visibility = '';
+            this.quoteContainer.classList.add('ready');
             
             // Remove initial classes after container is visible and animation completes
             setTimeout(() => {
                 this.quoteText.classList.remove('initial-load');
                 this.quoteAuthor.classList.remove('initial-load');
-                quoteContainer.classList.remove('initial-load');
+                this.quoteContainer.classList.remove('initial-load');
             }, 1500);
             return;
         }
         
-        // Calculate current height before content change
-        const currentHeight = quoteContainer.offsetHeight;
-        
-        // Set current height explicitly to enable smooth transition
-        quoteContainer.style.height = currentHeight + 'px';
-        
-        // For subsequent quotes, use smooth transition
-        this.quoteText.classList.add('quote-fade-out');
-        this.quoteAuthor.classList.add('quote-fade-out');
+        // Use deck swap animation for subsequent quotes
+        await this.animateDeckSwap(quote);
+    }
 
-        // Wait for fade-out animation (0.3s)
-        await this.delay(300);
-
-        // Create a temporary container to measure new content height
-        const tempContainer = quoteContainer.cloneNode(true);
-        tempContainer.style.position = 'absolute';
-        tempContainer.style.visibility = 'hidden';
-        tempContainer.style.height = 'auto';
-        tempContainer.style.top = '-9999px';
+    async animateDeckSwap(quote) {
+        // Prevent multiple animations from running simultaneously
+        if (this.isAnimating) return;
+        this.isAnimating = true;
         
-        // Update content in temp container
-        const tempQuoteText = tempContainer.querySelector('#quote-text');
-        const tempQuoteAuthor = tempContainer.querySelector('#quote-author');
-        tempQuoteText.textContent = `"${quote.text}"`;
-        tempQuoteAuthor.textContent = `— ${quote.author}`;
+        // Add deck swap classes to container
+        this.quoteContainer.classList.add('deck-swap-enhanced');
         
-        // Add temp container to DOM to measure
-        document.body.appendChild(tempContainer);
-        const newHeight = tempContainer.offsetHeight;
-        document.body.removeChild(tempContainer);
+        // Prepare the next quote on the back card
+        this.nextQuoteText.textContent = `"${quote.text}"`;
+        this.nextQuoteAuthor.textContent = `— ${quote.author}`;
         
-        // Update actual content
+        // Ensure the back card is properly positioned
+        this.nextQuoteCard.style.opacity = '1';
+        this.nextQuoteCard.style.transform = 'rotateY(180deg)';
+        
+        // Start the flip animation
+        this.currentQuoteCard.classList.add('flip-out');
+        this.nextQuoteCard.classList.add('flip-in');
+        
+        // Wait for the flip animation to complete
+        await this.delay(1000);
+        
+        // Swap the cards
         this.quoteText.textContent = `"${quote.text}"`;
         this.quoteAuthor.textContent = `— ${quote.author}`;
         
-        // Animate to new height with 0.3s ease transition
-        quoteContainer.style.height = newHeight + 'px';
-
-        // Remove fade-out and add fade-in
-        this.quoteText.classList.remove('quote-fade-out');
-        this.quoteAuthor.classList.remove('quote-fade-out');
-        this.quoteText.classList.add('quote-fade-in');
-        this.quoteAuthor.classList.add('quote-fade-in');
-
-        // Clean up fade-in class and height style after animation
+        // Reset card states
+        this.currentQuoteCard.classList.remove('flip-out');
+        this.nextQuoteCard.classList.remove('flip-in');
+        
+        // Reset the back card position
+        this.nextQuoteCard.style.opacity = '0';
+        this.nextQuoteCard.style.transform = 'rotateY(180deg)';
+        
+        // Clean up classes after animation
         setTimeout(() => {
-            this.quoteText.classList.remove('quote-fade-in');
-            this.quoteAuthor.classList.remove('quote-fade-in');
-            
-            // Remove height constraint after 1s transition
-            setTimeout(() => {
-                quoteContainer.style.height = '';
-            }, 1100); // Slightly longer than 1s to ensure transition completes
-        }, 300); // Keep fade timing at 0.3s
+            this.quoteContainer.classList.remove('deck-swap-enhanced');
+            this.isAnimating = false;
+        }, 100);
     }
 
     delay(ms) {
@@ -207,13 +198,22 @@ class DailyQuotesExtension {
     }
     
     handleRefreshClick(buttonElement) {
-        // Add visual feedback for button click
-        buttonElement.classList.add('clicked');
+        // Remove any existing clicked class to reset animation
+        buttonElement.classList.remove('clicked');
         
-        // Remove the clicked class after animation completes
+        // Force a reflow to ensure the class removal is processed
+        buttonElement.offsetHeight;
+        
+        // Small delay to ensure reset is complete
         setTimeout(() => {
-            buttonElement.classList.remove('clicked');
-        }, 600);
+            // Add visual feedback for button click
+            buttonElement.classList.add('clicked');
+            
+            // Remove the clicked class after animation completes
+            setTimeout(() => {
+                buttonElement.classList.remove('clicked');
+            }, 1000); // Match the deck swap animation duration
+        }, 10);
     }
 
     // Store/retrieve last viewed date to ensure daily quotes work properly
