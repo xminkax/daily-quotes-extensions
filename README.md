@@ -1,6 +1,10 @@
 # Daily Quotes - Chrome Extension
 
+🎉 **Ready for Chrome Web Store Submission!** 🎉
+
 A beautiful Chrome extension that replaces your new tab page with inspiring daily quotes and smooth animations.
+
+> **Status**: Extension is fully packaged and ready for Chrome Web Store submission. See `CHROME_STORE_SUBMISSION_GUIDE.md` for detailed instructions.
 
 ## Features
 
